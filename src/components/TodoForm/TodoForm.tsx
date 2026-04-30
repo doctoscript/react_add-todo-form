@@ -1,9 +1,9 @@
 import { FC, FormEvent, useState } from 'react';
 import usersFromServer from '../../api/users';
-import { Todo } from '../../types/Todo';
+import { Todo } from '../../services/Todo';
 
 interface Props {
-  onSubmit: (newTodo: Omit<Todo, 'id'>) => void
+  onSubmit: (newTodo: Omit<Todo, 'id'>) => void;
 }
 
 export const TodoForm: FC<Props> = ({ onSubmit }) => {
@@ -36,11 +36,7 @@ export const TodoForm: FC<Props> = ({ onSubmit }) => {
   };
 
   return (
-    <form
-      action="/api/users"
-      method="POST"
-      onSubmit={handleSubmit}
-    >
+    <form action="/api/users" method="POST" onSubmit={handleSubmit}>
       <div className="field">
         <label>
           {'Title: '}
@@ -50,16 +46,14 @@ export const TodoForm: FC<Props> = ({ onSubmit }) => {
             type="text"
             data-cy="titleInput"
             value={title}
-            onChange={(event) => {
+            onChange={event => {
               setTitle(event.target.value);
               setTitleError(false);
             }}
           />
         </label>
 
-        {hasTitleError && (
-          <span className="error">Please enter a title</span>
-        )}
+        {hasTitleError && <span className="error">Please enter a title</span>}
       </div>
 
       <div className="field">
@@ -69,33 +63,24 @@ export const TodoForm: FC<Props> = ({ onSubmit }) => {
           <select
             data-cy="userSelect"
             value={userId}
-            onChange={(event) => {
+            onChange={event => {
               setUserId(Number(event.target.value));
               setUserError(false);
             }}
           >
-            <option
-              selected
-              value="0"
-              disabled
-            >
+            <option selected value="0" disabled>
               Choose a user
             </option>
 
             {usersFromServer.map(user => (
-              <option
-                key={user.id}
-                value={user.id}
-              >
+              <option key={user.id} value={user.id}>
                 {user.name}
               </option>
             ))}
           </select>
         </label>
 
-        {hasUserError && (
-          <span className="error">Please choose a user</span>
-        )}
+        {hasUserError && <span className="error">Please choose a user</span>}
       </div>
 
       <button type="submit" data-cy="submitButton">

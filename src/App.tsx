@@ -1,58 +1,40 @@
-import { useEffect, useState } from 'react';
 import './App.scss';
-import usersFromServer from './api/users';
-import todosFromServer from './api/todos';
 import { TodoList } from './components/TodoList';
+import todosFromServer from './api/todos';
+import { useState } from 'react';
+import { getUserById } from './services/user';
 import { Todo } from './types/Todo';
-import { TodoForm } from './components/TodoForm';
+import { PostForm } from './PostForm';
 
-const todoWithUser: Todo[] = todosFromServer.map(todo => ({
+const initialTodos: Todo[] = todosFromServer.map(todo => ({
   ...todo,
-  user: usersFromServer.find(user => user.id === todo.userId) || null,
+  user: getUserById(todo.userId),
+
 }));
 
-export const App = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
+function getNewTodoId(todos: Todo[]) {
+  const maxId = Math.max(...todos.map(todo => todo.id));
 
-  const addTodo = (newTodo: Omit<Todo, 'id'>) => {
-    const todoToAdd = {
-      id: Math.max(...todos.map(todo => todo.id)) + 1,
-      ...newTodo,
+  return maxId + 1;
+}
+
+export const App: React.FC = () => {
+  const [todos, setTodos] = useState<Todo[]>(initialTodos);
+
+  const onAddTodo = ({ id, ...data }: Todo) => {
+    const newTodo = {
+      id: getNewTodoId(todos),
+      ...data,
     };
 
-    setTodos((currentTodos) => [...currentTodos, todoToAdd]);
+    setTodos(currentTodo => [...currentTodo, newTodo]);
   };
-
-  const deleteTodo = (todoID: number) => {
-    setTodos((currentTodos) => currentTodos.filter(
-      todo => todo.id !== todoID,
-    ));
-  };
-
-  // const updateTodo = (updatedTodo: Todo) => {
-  //   setTodos((currentTodos) => currentTodos.map(
-  //     todo => (todo.id === updatedTodo.id ? updatedTodo : todo),
-  //   ));
-  // };
-
-  useEffect(() => {
-    setTimeout(() => {
-      setTodos(todoWithUser);
-    }, 500);
-  }, []);
 
   return (
     <div className="App">
       <h1>Add todo form</h1>
-       <TodoForm
-        onSubmit={addTodo}
-      />
-
-      <TodoList
-        todos={todos}
-        onTodosDeleted={deleteTodo}
-        // onTodosUpdated={updateTodo}
-      />
+    <PostForm onSubmit={onAddTodo} />
+      <TodoList todos={todos} />
     </div>
   );
 };
