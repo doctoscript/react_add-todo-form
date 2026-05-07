@@ -2,9 +2,11 @@ import usersFromServer from './api/users';
 
 import { useState } from 'react';
 import { getUserById } from './services/user';
-import { Todo } from './types/Todo';
+import { Todo } from './services/Todo';
+import { User } from './types/User';
 
 type Props = {
+  users: User[];
   onSubmit: (todo: Todo) => void;
 };
 
@@ -48,7 +50,7 @@ export const PostForm: React.FC<Props> = ({ onSubmit }) => {
       completed: false,
       userId,
       user: getUserById(userId),
- });
+    });
 
     reset();
   };
